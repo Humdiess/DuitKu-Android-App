@@ -1,11 +1,12 @@
 /**
- * API Service Layer
- * Handles all API requests to DuitKu backend
+ * API Service
+ * Centralized API client for DuitKu backend
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://duitku.agriconnect.my.id/api/v1';
+// Use environment variable for API base URL
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://duitku.agriconnect.my.id/api/v1';
 
 interface ApiResponse<T = any> {
   status: 'success' | 'error';
@@ -47,7 +48,7 @@ class ApiService {
     }
 
     try {
-      const response = await fetch(`${API_URL}${endpoint}`, config);
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
       const data = await response.json();
 
       if (!response.ok) {
@@ -76,14 +77,14 @@ class ApiService {
     return data;
   }
 
-  async register(name: string, email: string, password: string) {
+  async register(name: string, email: string, password: string, password_confirmation: string) {
     const data = await this.request('/auth/register', {
       method: 'POST',
       body: {
         name,
         email,
         password,
-        password_confirmation: password,
+        password_confirmation,
       },
     });
     if (data.data?.token) {
